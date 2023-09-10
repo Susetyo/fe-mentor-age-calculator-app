@@ -5,12 +5,44 @@ import IconArrow from "./assets/icon-arrow.svg";
 function Divider() {
   const { age, setAge } = useContext(AgeContext);
 
+  const calculateAge = () => {
+    const currentYears = new Date().getFullYear();
+    const currentMonths = new Date().getMonth() + 1;
+    const currentDay = new Date().getDate();
+
+    const bornYears = parseInt(age?.years?.value);
+    const bornMonths = parseInt(age?.months.value);
+    const bornDay = parseInt(age?.day.value);
+
+    let diffYears = currentYears - bornYears;
+    let diffMonths = currentMonths - bornMonths;
+    let diffDay = currentDay - bornDay;
+
+    if (diffDay < 0) {
+      diffMonths--;
+      diffDay += new Date(currentYears, currentMonths - 1, 0).getDate();
+    }
+
+    if (diffMonths < 0) {
+      diffYears--;
+      diffMonths += 12;
+    }
+
+    return {
+      years: diffYears,
+      months: diffMonths,
+      day: diffDay,
+    };
+  };
+
   const onClick = () => {
-    const getLastDate = new Date(
-      new Date(`${age?.months?.value} 01 ${age?.years?.value}`).getFullYear(),
-      new Date(`${age?.months?.value} 01 ${age?.years?.value}`).getMonth() + 1,
-      0
-    ).getDate();
+    const getLastDate =
+      new Date(
+        new Date(`${age?.months?.value} 01 ${age?.years?.value}`).getFullYear(),
+        new Date(`${age?.months?.value} 01 ${age?.years?.value}`).getMonth() +
+          1,
+        0
+      ).getDate() + 1;
     const empty = !age?.years?.value || !age?.months?.value || !age?.day?.value;
     const invalid =
       parseInt(age?.years?.value) > new Date().getFullYear() ||
@@ -71,11 +103,7 @@ function Divider() {
           ...age?.day,
           error: false,
         },
-        result: {
-          years: age?.years?.value,
-          months: age?.months?.value,
-          day: age?.day?.value,
-        },
+        result: calculateAge(),
       });
     }
   };
